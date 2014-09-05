@@ -11,7 +11,7 @@ function FilterTree (data, fns, opts) {
 }
 
 function query (data, fns, opts, q) {
-  var tree = NavTree(cloneDeep(data))
+  var tree = NavTree(cloneDeep(data), opts)
 
   return process.runFilter(tree, fns, opts, q || '')
 }
