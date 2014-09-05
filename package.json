@@ -1,0 +1,21 @@
+{
+  "name": "option-tree-filter",
+  "description": "filter an option tree",
+  "version": "0.0.0",
+  "repository": {
+    "url": "nrw/option-tree-filter"
+  },
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "test": "tape test/*.js",
+    "watch": "nodemon -q -x 'tape test/*.js' | tap-colorize"
+  },
+  "dependencies": {
+    "lodash.clonedeep": "^2.4.1",
+    "option-tree-navigate": "^0.3.0"
+  },
+  "devDependencies": {
+    "tape": "2.x.x"
+  }
+}
