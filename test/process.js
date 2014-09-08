@@ -3,7 +3,7 @@ var clone = require('lodash.clonedeep')
 var NavTree = require('option-tree-navigate')
 var process = require('../process')
 
-var tree, filter, fns, node, path, data
+var tree, filter, fn, node, path, data
 
 test('test tree', function (t) {
   data = [{
@@ -30,13 +30,11 @@ test('test tree', function (t) {
 
   var treeCopy = clone(data)
 
-  fns = [
-    function idExact (opt, query) {
-      return opt.id && opt.id === query
-    }
-  ]
+  fn = function idExact (opt, query) {
+    return opt.id && opt.id === query
+  }
 
-  t.same(process.testNodes(NavTree(data), fns, 'c')._tree, [{
+  t.same(process.testNodes(NavTree(data), fn, 'c')._tree, [{
     id: '1',
     passes: false,
     options: [
@@ -130,7 +128,7 @@ test('more filters', function (t) {
   }]
   var copy = clone(tree)
 
-  fns = [function (opt, query) {
+  fn = function (opt, query) {
     try {
       var regex = new RegExp(query, 'i')
       return (
@@ -140,9 +138,9 @@ test('more filters', function (t) {
     } catch (e) {
       return false
     }
-  }]
+  }
 
-  t.same(process.runFilter(NavTree(clone(tree)), fns, {}, 'a'), [{
+  t.same(process.runFilter(NavTree(clone(tree)), fn, {}, 'a'), [{
     title: 'first',
     passes: false,
     keep: true,
@@ -152,7 +150,7 @@ test('more filters', function (t) {
   }])
   t.same(copy, tree)
 
-  t.same(process.runFilter(NavTree(tree), fns, {}, 'e'), [{
+  t.same(process.runFilter(NavTree(tree), fn, {}, 'e'), [{
     title: 'second',
     passes: true,
     keep: true,

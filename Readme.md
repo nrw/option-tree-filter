@@ -27,11 +27,9 @@ var tree = FilterTree([{
     {id: 'e'},
     {id: 'f'}
   ]
-}], [
-  function idExact (opt, query) {
-    return opt.id && opt.id === query
-  }
-])
+}], function idExact (opt, query) {
+  return opt.id && opt.id === query
+})
 
 // returns a copy. original data is unchanged.
 assert.deepEqual(tree.query('e'), [{

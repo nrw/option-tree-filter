@@ -1,10 +1,10 @@
 // omit if
-// - any filter function returns false AND
-// - no child node got all trues from the filter functions
+// - filter function returns false AND
+// - no child node passed the filter function
 
 // keep if
-// - all filter functions returned true OR
-// - any child node received true for all filter functions
+// - filter functions returned true OR
+// - any child node received true from filter function
 
 module.exports = {
   testNodes: testNodes,
@@ -14,20 +14,20 @@ module.exports = {
 }
 
 // takes a NavTree, returns raw object
-function runFilter (tree, fns, opts, query) {
-  testNodes(tree, fns, query)
+function runFilter (tree, fn, opts, query) {
+  testNodes(tree, fn, query)
   markKeepers(tree)
   filterTree(tree._tree, opts)
   return tree._tree
 }
 
 // takes a NavTree, returns it
-function testNodes (tree, fns, query) {
+function testNodes (tree, fn, query) {
   var node, path, passes
 
   while ((path = tree.nextNode(path))) {
     node = tree.readPath(path)
-    node.passes = passesAll(fns, node, query)
+    node.passes = !!fn(node, query)
   }
   return tree
 }
@@ -69,11 +69,4 @@ function filterTree (tree, opts) {
 
 function passes (obj) {
   return obj.passes
-}
-
-function passesAll (fns, node, query) {
-  for (var i = 0; i < fns.length; i++) {
-    if (!fns[i](node, query)) return false
-  }
-  return true
 }

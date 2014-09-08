@@ -2,9 +2,9 @@ var test = require('tape')
 var clone = require('lodash.clonedeep')
 var FilterTree = require('..')
 
-var tree, filter, fns, node, path, data, ids
+var tree, filter, fn, node, path, data, ids
 
-test('alternate api', function (t) {
+test('simple filter', function (t) {
   ids = ['a']
 
   data = [{
@@ -31,24 +31,27 @@ test('alternate api', function (t) {
 
   var orig = clone(data)
 
-  fns = [
-    function searchFilter (opt, query) {
-      try {
-        var regex = new RegExp(query, 'i')
-        return (
-          (opt.id && regex.test(opt.id)) ||
-          (opt.title && regex.test(opt.title))
-        )
-      } catch (e) {
-        return false
-      }
-    },
-    function unselectedFilter (opt) {
-      return !opt.id || !~ids.indexOf(opt.id)
-    }
-  ]
+  fn = function (opt, query) {
+    return searchFilter(opt, query) && unselectedFilter(opt)
+  }
 
-  tree = FilterTree(data, fns, {})
+  function searchFilter (opt, query) {
+    try {
+      var regex = new RegExp(query, 'i')
+      return (
+        (opt.id && regex.test(opt.id)) ||
+        (opt.title && regex.test(opt.title))
+      )
+    } catch (e) {
+      return false
+    }
+  }
+
+  function unselectedFilter (opt) {
+    return !opt.id || !~ids.indexOf(opt.id)
+  }
+
+  tree = FilterTree(data, fn, {})
 
   t.same(tree.query(''), [{
     title: 'first',
@@ -79,7 +82,7 @@ test('alternate api', function (t) {
     ]
   }])
 
-  tree = FilterTree(data, fns, {keepMatchChildren: true})
+  tree = FilterTree(data, fn, {keepMatchChildren: true})
 
   t.same(tree.query('e'), [{
     title: 'second',
@@ -102,7 +105,7 @@ test('alternate api', function (t) {
     ]
   }])
 
-  tree = FilterTree(data, fns, {keepMatchChildren: false})
+  tree = FilterTree(data, fn, {keepMatchChildren: false})
 
   t.same(tree.query('e'), [{
     title: 'second',

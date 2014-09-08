@@ -4,14 +4,14 @@ var process = require('./process')
 
 module.exports = FilterTree
 
-function FilterTree (data, fns, opts) {
+function FilterTree (data, fn, opts) {
   return {
-    query: query.bind(null, data, fns, opts)
+    query: query.bind(null, data, fn, opts)
   }
 }
 
-function query (data, fns, opts, q) {
+function query (data, fn, opts, q) {
   var tree = NavTree(cloneDeep(data), opts)
 
-  return process.runFilter(tree, fns, opts, q || '')
+  return process.runFilter(tree, fn, opts, q || '')
 }
