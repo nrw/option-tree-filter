@@ -55,30 +55,22 @@ test('simple filter', function (t) {
 
   t.same(tree.query(''), [{
     title: 'first',
-    keep: true,
-    passes: true,
     options: [
-      {id: 'b', keep: true, passes: true}
+      {id: 'b'}
     ]
   }, {
     title: 'second',
-    keep: true,
-    passes: true,
     options: [{
       id: 'c',
-      keep: true,
-      passes: true,
       options: [
-        {id: 'd', keep: true, passes: true}
+        {id: 'd'}
       ]
     }]
   }, {
     title: 'third',
-    keep: true,
-    passes: true,
     options: [
-      {id: 'e', keep: true, passes: true},
-      {id: 'f', keep: true, passes: true}
+      {id: 'e'},
+      {id: 'f'}
     ]
   }])
 
@@ -86,22 +78,16 @@ test('simple filter', function (t) {
 
   t.same(tree.query('e'), [{
     title: 'second',
-    keep: true,
-    passes: true,
     options: [{
       id: 'c',
-      keep: false,
-      passes: false,
       options: [
-        {id: 'd', keep: false, passes: false}
+        {id: 'd'}
       ]
     }]
   }, {
     title: 'third',
-    keep: true,
-    passes: false,
     options: [
-      {id: 'e', keep: true, passes: true}
+      {id: 'e'}
     ]
   }])
 
@@ -109,15 +95,11 @@ test('simple filter', function (t) {
 
   t.same(tree.query('e'), [{
     title: 'second',
-    keep: true,
-    passes: true,
     options: []
   }, {
     title: 'third',
-    keep: true,
-    passes: false,
     options: [
-      {id: 'e', keep: true, passes: true}
+      {id: 'e'}
     ]
   }])
 

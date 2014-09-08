@@ -34,29 +34,33 @@ test('test tree', function (t) {
     return opt.id && opt.id === query
   }
 
-  t.same(process.testNodes(NavTree(data), fn, 'c')._tree, [{
+  t.same(process.testNodes(NavTree(data), fn, {}, 'c')._tree, [{
     id: '1',
     passes: false,
+    keepChildren: false,
     options: [
-      {id: 'a', passes: false},
-      {id: 'b', passes: false}
+      {id: 'a', passes: false, keepChildren: false},
+      {id: 'b', passes: false, keepChildren: false}
     ]
   }, {
     id: '2',
     passes: false,
+    keepChildren: false,
     options: [{
       id: 'c',
       passes: true,
+      keepChildren: false,
       options: [
-        {id: 'd', passes: false}
+        {id: 'd', passes: false, keepChildren: false}
       ]
     }]
   }, {
     id: '3',
     passes: false,
+    keepChildren: false,
     options: [
-      {id: 'e', passes: false},
-      {id: 'f', passes: false}
+      {id: 'e', passes: false, keepChildren: false},
+      {id: 'f', passes: false, keepChildren: false}
     ]
   }])
 
@@ -64,40 +68,40 @@ test('test tree', function (t) {
     id: '1',
     passes: false,
     keep: false,
+    keepChildren: false,
+
     options: [
-      {id: 'a', passes: false, keep: false},
-      {id: 'b', passes: false, keep: false}
+      {id: 'a', passes: false, keep: false, keepChildren: false},
+      {id: 'b', passes: false, keep: false, keepChildren: false}
     ]
   }, {
     id: '2',
-    passes: false, keep: true,
+    passes: false, keep: true, keepChildren: false,
     options: [{
       id: 'c',
       passes: true,
       keep: true,
+      keepChildren: false,
       options: [
-        {id: 'd', passes: false, keep: false}
+        {id: 'd', passes: false, keep: false, keepChildren: false}
       ]
     }]
   }, {
     id: '3',
     passes: false,
     keep: false,
+    keepChildren: false,
     options: [
-      {id: 'e', passes: false, keep: false},
-      {id: 'f', passes: false, keep: false}
+      {id: 'e', passes: false, keep: false, keepChildren: false},
+      {id: 'f', passes: false, keep: false, keepChildren: false}
     ]
   }])
 
   t.same(process.filterTree(data), [{
     id: '2',
-    passes: false,
-    keep: true,
     options: [{
       id: 'c',
-      options: [],
-      keep: true,
-      passes: true
+      options: []
     }]
   }])
 
@@ -142,27 +146,80 @@ test('more filters', function (t) {
 
   t.same(process.runFilter(NavTree(clone(tree)), fn, {}, 'a'), [{
     title: 'first',
-    passes: false,
-    keep: true,
     options: [
-      {id: 'a', keep: true, passes: true}
+      {id: 'a'}
     ]
   }])
   t.same(copy, tree)
 
   t.same(process.runFilter(NavTree(tree), fn, {}, 'e'), [{
     title: 'second',
-    passes: true,
-    keep: true,
     options: []
   }, {
     title: 'third',
-    passes: false,
-    keep: true,
     options: [
-      {id: 'e', keep: true, passes: true}
+      {id: 'e'}
     ]
   }])
+
+  t.end()
+})
+
+test('forward arguments to filter fn', function (t) {
+  tree = [{
+    title: 'first',
+    options: [
+      {id: 'a'},
+      {id: 'b'}
+    ]
+  }, {
+    title: 'second',
+    options: [{
+      id: 'c',
+      options: [
+        {id: 'd'}
+      ]
+    }]
+  }, {
+    title: 'third',
+    options: [
+      {id: 'e'},
+      {id: 'f'}
+    ]
+  }]
+  var copy = clone(tree)
+
+  fn = function (opt, query, value) {
+    for (var i = value.length - 1; i >= 0; i--) {
+      if (opt.id === value[i].id) {
+        return {
+          keep: false,
+          passes: false,
+          keepChildren: false
+        }
+      }
+    }
+    try {
+      var regex = new RegExp(query, 'i')
+      return {
+        passes: (
+          (opt.id && regex.test(opt.id)) ||
+          (opt.title && regex.test(opt.title))
+        ),
+        keepChildren: true
+      }
+    } catch (e) {
+      return {passes: false}
+    }
+  }
+
+  t.same(process.runFilter(NavTree(clone(tree)), fn, {}, 'th', [{id: 'e'}]), [{
+    title: 'third',
+    options: [
+      {id: 'f'}
+    ]
+  }])
+  t.same(copy, tree)
 
   t.end()
 })
